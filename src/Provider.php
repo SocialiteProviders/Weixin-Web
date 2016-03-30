@@ -25,6 +25,7 @@ class Provider extends AbstractProvider implements ProviderInterface
 
     /**
      * set Open Id.
+     *
      * @param string $openId
      */
     public function setOpenId($openId)
