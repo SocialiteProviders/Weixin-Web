@@ -36,8 +36,6 @@ class Provider extends AbstractProvider implements ProviderInterface
      */
     protected function buildAuthUrlFromBase($url, $state)
     {
-        $session = $this->request->getSession();
-
         $query = http_build_query($this->getCodeFields($state), '', '&', $this->encodingType);
 
         return $url.'?'.$query.'#wechat_redirect';
@@ -72,7 +70,7 @@ class Provider extends AbstractProvider implements ProviderInterface
         $response = $this->getHttpClient()->get('https://api.weixin.qq.com/sns/userinfo', [
             'query' => [
                 'access_token' => $token,
-                'openid' => $this->openId,
+                'openid' => $this->credentialsResponseBody['openid'],
                 'lang' => 'zh_CN',
             ],
         ]);
@@ -111,33 +109,9 @@ class Provider extends AbstractProvider implements ProviderInterface
             'query' => $this->getTokenFields($code),
         ]);
 
-        return $this->parseAccessToken($response->getBody()->getContents());
+        $this->credentialsResponseBody = json_decode($response->getBody(), true);
+
+        return $this->parseAccessToken($response->getBody());
     }
 
-    /**
-     * {@inheritdoc}.
-     */
-    protected function parseAccessToken($body)
-    {
-        $jsonArray = json_decode($body, true);
-        $this->openId = $jsonArray['openid'];
-
-        return $jsonArray['access_token'];
-    }
-
-    /**
-     * @param mixed $response
-     *
-     * @return string
-     */
-    protected function removeCallback($response)
-    {
-        if (strpos($response, 'callback') !== false) {
-            $lpos = strpos($response, '(');
-            $rpos = strrpos($response, ')');
-            $response = substr($response, $lpos + 1, $rpos - $lpos - 1);
-        }
-
-        return $response;
-    }
 }
