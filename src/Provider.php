@@ -108,5 +108,4 @@ class Provider extends AbstractProvider implements ProviderInterface
 
         return $this->parseAccessToken($response->getBody());
     }
-
 }
