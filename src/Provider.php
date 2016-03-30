@@ -14,9 +14,23 @@ class Provider extends AbstractProvider implements ProviderInterface
     const IDENTIFIER = 'WEIXINWEB';
 
     /**
+     * @var string
+     */
+    protected $openId;
+
+    /**
      * {@inheritdoc}.
      */
     protected $scopes = ['snsapi_login'];
+
+    /**
+     * set Open Id
+     * @param string $openId
+     */
+    public function setOpenId($openId)
+    {
+        $this->openId = $openId;
+    }
 
     /**
      * {@inheritdoc}.
@@ -65,7 +79,7 @@ class Provider extends AbstractProvider implements ProviderInterface
         $response = $this->getHttpClient()->get('https://api.weixin.qq.com/sns/userinfo', [
             'query' => [
                 'access_token' => $token,
-                'openid' => $this->credentialsResponseBody['openid'],
+                'openid' => $this->openId,
                 'lang' => 'zh_CN',
             ],
         ]);
@@ -105,6 +119,7 @@ class Provider extends AbstractProvider implements ProviderInterface
         ]);
 
         $this->credentialsResponseBody = json_decode($response->getBody(), true);
+        $this->openId = $this->credentialsResponseBody['openid'];
 
         return $this->parseAccessToken($response->getBody());
     }
