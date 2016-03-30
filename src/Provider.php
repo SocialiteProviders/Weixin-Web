@@ -24,7 +24,7 @@ class Provider extends AbstractProvider implements ProviderInterface
     protected $scopes = ['snsapi_login'];
 
     /**
-     * set Open Id
+     * set Open Id.
      * @param string $openId
      */
     public function setOpenId($openId)
