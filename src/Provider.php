@@ -38,7 +38,11 @@ class Provider extends AbstractProvider implements ProviderInterface
      */
     protected function getAuthUrl($state)
     {
-        return $this->buildAuthUrlFromBase('https://open.weixin.qq.com/connect/qrconnect', $state);
+        //return $this->buildAuthUrlFromBase('https://open.weixin.qq.com/connect/qrconnect', $state);
+        return $this->buildAuthUrlFromBase($this->getConfig(
+            'auth_base_uri',
+            'https://open.weixin.qq.com/connect/qrconnect'
+        ), $state);
     }
 
     /**
@@ -113,7 +117,7 @@ class Provider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}.
      */
-    public function getAccessToken($code)
+    public function getAccessTokenResponse($code)
     {
         $response = $this->getHttpClient()->get($this->getTokenUrl(), [
             'query' => $this->getTokenFields($code),
@@ -122,6 +126,12 @@ class Provider extends AbstractProvider implements ProviderInterface
         $this->credentialsResponseBody = json_decode($response->getBody(), true);
         $this->openId = $this->credentialsResponseBody['openid'];
 
-        return $this->parseAccessToken($response->getBody());
+        //return $this->parseAccessToken($response->getBody());
+        return $this->credentialsResponseBody;
+    }
+
+    public static function additionalConfigKeys()
+    {
+        return ['auth_base_uri'];
     }
 }
